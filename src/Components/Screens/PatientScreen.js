@@ -9,6 +9,7 @@ import moment from 'moment';
 import { GoDeviceMobile, GoCircleSlash } from 'react-icons/go';
 import ContactModal from '../../Modals/ContactModal';
 import GetPatientsService from '../../Services/Patient/GetPatientsService';
+import AddContactService from '../../Services/Patient/AddContactService';
 
 
 function PatientScreen() {
@@ -21,8 +22,9 @@ function PatientScreen() {
   const [alertDisplay, changeAlertDisplay] = useState(false);
   const [alertDisplayError, changeAlertDisplayError] = useState(false);
   const [alertError, setErrorMsg] = useState(false);
-
   const [contacts, setContacts] = useState([]);
+  const [pctContact, setPctContact] = useState();
+  const [successAlert, setMsgSuccess] = useState();
 
   const columns = [
     {
@@ -79,7 +81,7 @@ function PatientScreen() {
       formatter: ({ row }) => {
         return (
           <>
-            <span onClick={() => checkContacts(row.contacts)}><GoDeviceMobile /></span>
+            <span onClick={() => checkContacts(row.patient_id, row.contacts)}><GoDeviceMobile /></span>
           </>
         )
       }
@@ -157,9 +159,8 @@ function PatientScreen() {
   }
 
   async function afterCreateCB(resp) {
-    let newRows = [...rows];
-    console.log('AFTER DC', resp)
     if (resp.success) {
+      setMsgSuccess('Usuário criado com sucesso!')
       changeAlertDisplay(true)
       changeModalDisplay(false)
       let result = await GetPatientsService();
@@ -169,8 +170,36 @@ function PatientScreen() {
       setErrorMsg(resp.error)
       changeAlertDisplayError(true);
     }
-
   }
+
+  async function addContactCB(resp) {
+    if (resp.success) {
+      setMsgSuccess('Contato criado com sucesso!')
+      changeAlertDisplay(true)
+      changeContactDisplay(false)
+      let result = await GetPatientsService();
+      if (result.success)
+        setPatients(result.success)
+    } else {
+      setErrorMsg(resp.error)
+      changeAlertDisplayError(true);
+    }
+  }
+
+  async function deleteContactCB(resp) {
+    if (resp.success) {
+      setMsgSuccess('Contato removido!')
+      changeAlertDisplay(true)
+      changeContactDisplay(false)
+      let result = await GetPatientsService();
+      if (result.success)
+        setPatients(result.success)
+    } else {
+      setErrorMsg(resp.error)
+      changeAlertDisplayError(true);
+    }
+  }
+
 
   function closeAlert() {
     changeAlertDisplay(false)
@@ -179,13 +208,11 @@ function PatientScreen() {
   function closeAlertError() {
     changeAlertDisplayError(false)
   }
-  // function closeModal(){
-  //   setIsOpen(false);
-  // }
 
-  function checkContacts(contacts) {
-    changeContactDisplay(true)
+  function checkContacts(patient_id, contacts) {
     setContacts(contacts)
+    setPctContact(patient_id)
+    changeContactDisplay(true)
   }
 
   return (
@@ -205,15 +232,14 @@ function PatientScreen() {
         onRowsUpdate={handleRowUpdate}
       />
       <PatientFormModal display={modalDisplay} updateDisplay={changeModalDisplay} afterCreateCB={afterCreateCB} />
-      <ContactModal display={contactDisplay} updateDisplay={changeContactDisplay} contacts={contacts} />
+      <ContactModal display={contactDisplay} updateDisplay={changeContactDisplay} patientId={pctContact} contacts={contacts} addCB={addContactCB} deleteCB={deleteContactCB} />
       <SweetAlert
         success
-        title="Usuário criado com sucesso"
+        title={successAlert}
         show={alertDisplay}
         onConfirm={closeAlert}
         confirmBtnBsStyle="success"
       >
-        HAHA
       </SweetAlert>
       <SweetAlert
         danger
