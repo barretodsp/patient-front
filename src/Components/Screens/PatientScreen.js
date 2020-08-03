@@ -4,12 +4,13 @@ import 'react-data-grid/dist/react-data-grid.css';
 import SweetAlert from 'react-bootstrap-sweetalert';
 import PatientFormModal from '../../Modals/PatientFormModal';
 import CpfFormatter from '../../Formatters/CpfFormatter';
-import CPF from 'cpf';
-import moment from 'moment';
 import { GoDeviceMobile, GoCircleSlash } from 'react-icons/go';
 import ContactModal from '../../Modals/ContactModal';
 import GetPatientsService from '../../Services/Patient/GetPatientsService';
 import '../../assets/css/formStyle.css'
+import DeletePatientService from '../../Services/Patient/DeletePatientService';
+import UpdatePatientService from '../../Services/Patient/UpdatePatientService';
+import DateFormater from '../../Formatters/DateFormatter';
 
 
 function PatientScreen() {
@@ -25,11 +26,20 @@ function PatientScreen() {
   const [contacts, setContacts] = useState([]);
   const [pctContact, setPctContact] = useState();
   const [successAlert, setMsgSuccess] = useState();
+  const [displayWarning, setDisplayWarning] = useState(false);
+  const [warningAlert, setMsgWarning] = useState();
 
   const columns = [
     {
       key: 'actions',
-      name: 'Ações'
+      name: 'Ações',
+      formatter: ({ row }) => {
+        return (
+          <div class='icon-center' >
+            <span onClick={() => deletePatient(row.patient_id, row.first_name)}><GoCircleSlash /></span>
+          </div>
+        )
+      }
     },
     {
       key: 'cpf',
@@ -81,7 +91,7 @@ function PatientScreen() {
       formatter: ({ row }) => {
         return (
           <div class='icon-center' >
-            <span onClick={() => checkContacts(row.patient_id, row.contacts)}><GoDeviceMobile  /></span>
+            <span onClick={() => checkContacts(row.patient_id, row.contacts)}><GoDeviceMobile /></span>
           </div>
         )
       }
@@ -90,6 +100,7 @@ function PatientScreen() {
       key: 'birth_dt',
       name: 'Nascimento',
       editable: false,
+      formatter: ({ row }) => <DateFormater value={row.birth_dt} />
     },
     {
       key: 'blood_type',
@@ -98,6 +109,7 @@ function PatientScreen() {
       filterRenderer: p => (
         <div className="rdg-filter-container">
           <select className="rdg-filter" value={p.value} onChange={e => p.onChange(e.target.value)}>
+            <option value=""></option>
             <option value="A+">A+</option>
             <option value="A-">A-</option>
             <option value="B+">B+</option>
@@ -114,7 +126,6 @@ function PatientScreen() {
 
   useEffect(async () => {
     let result = await GetPatientsService();
-    console.log('RESULT', result);
     if (result.success)
       setPatients(result.success)
     return;
@@ -126,19 +137,17 @@ function PatientScreen() {
         (filters.first_name ? r.first_name.includes(filters.first_name) : true) &&
         (filters.last_name ? r.last_name.includes(filters.last_name) : true) &&
         (filters.cpf ? r.cpf.includes(filters.cpf) : true) &&
-        (filters.blood_type ? r.blood_type === filters.blood_type : true) 
-        // && (filters.issueType !== 'All' ? r.issueType === filters.issueType : true)
-        // && (filters.developer ? r.developer === filters.developer.value : true)
-        // && (filters.complete ? filters.complete.filterValues(r, filters.complete, 'complete') : true)
+        (filters.blood_type ? r.blood_type === filters.blood_type : true)
       );
     });
   }, [rows, filters]);
 
   function clearFilters() {
     setFilters({
-      id: '',
-      title: '',
-      email: ''
+      first_name: '',
+      last_name: '',
+      cpf: '',
+      blood_type: ''
     });
   }
 
@@ -146,22 +155,20 @@ function PatientScreen() {
     setEnableFilters(!enableFilters);
   }
 
-  const handleRowUpdate = ({ fromRow, toRow, updated, action }) => {
-    // this.grid.openCellEditor(rowIdx, idx);
+  const handleRowUpdate = async ({ fromRow, toRow, updated, action }) => {
     try {
-      if (updated.hasOwnProperty('cpf') && CPF.isValid(updated.cpf)) {
-        console.log('CPF VALIDO?', CPF.isValid(updated.cpf))
-        console.log('TRANS?', CPF.format(updated.cpf))
-      } else if (updated.hasOwnProperty('nascimento')) {
-        console.log('111 DATA MOMENT', moment('1993-08-12').format('DD/MM/YYYY'))
-        console.log('222 DATA MOMENT', moment('12/08/1993').format('YYYY-MM-DD'))
-
+      const newRows = [...rows];
+      let obj = rows[fromRow];
+      if (updated.hasOwnProperty('first_name') && (!(/^\s*$/.test(updated.first_name))))
+        obj.first_name = updated.first_name
+      if (updated.hasOwnProperty('last_name') && (!(/^\s*$/.test(updated.last_name))))
+        obj.last_name = updated.last_name
+      let resp = await UpdatePatientService(obj.patient_id, obj.first_name, obj.last_name, obj.blood_type);
+      if (resp.success) {
+        newRows[toRow] = { ...newRows[toRow], ...updated }
+        setPatients(newRows)
       }
-      console.log('ROW In ID', rows[fromRow])
-      console.log('From = ', fromRow);
-      console.log('To = ', toRow)
-      console.log('Updated = ', updated)
-      console.log('Action = ', action)
+      return;
     } catch (er) {
       console.log('ERROR UPDATE >> ', er)
     }
@@ -228,12 +235,34 @@ function PatientScreen() {
     changeContactDisplay(true)
   }
 
+
+  function deletePatient(patient_id, fist_name) {
+    setMsgWarning(`O registro do paciente ${fist_name} será apagado.`)
+    setPctContact(patient_id)
+    setDisplayWarning(true)
+  }
+
+  async function confirmPctDelete() {
+    setDisplayWarning(false)
+    let resp = await DeletePatientService(pctContact);
+    if (resp.success) {
+      setMsgSuccess('Paciente removido!')
+      changeAlertDisplay(true)
+      let result = await GetPatientsService();
+      if (result.success)
+        setPatients(result.success)
+    } else {
+      setErrorMsg(resp.error)
+      changeAlertDisplayError(true);
+    }
+  }
+
   return (
     <div>
       <div style={{ marginBottom: 10, textAlign: 'right' }}>
         <button type="button" onClick={openModal}>Cadatrar Paciente</button>
-        <button type="button" onClick={toggleFilters}>Toggle Filters</button>{' '}
-        <button type="button" onClick={clearFilters}>Clear Filters</button>
+        <button type="button" onClick={toggleFilters}> {enableFilters ? 'Ocultar Filtros' : 'Exibir Filtros'} </button>{' '}
+        <button type="button" onClick={clearFilters}>Limpar Filtros</button>
       </div>
       <DataGrid
         rowKey="id"
@@ -241,6 +270,7 @@ function PatientScreen() {
         rows={filteredRows}
         enableFilters={enableFilters}
         filters={filters}
+        height={800}
         onFiltersChange={setFilters}
         onRowsUpdate={handleRowUpdate}
       />
@@ -261,6 +291,19 @@ function PatientScreen() {
         onConfirm={closeAlertError}
         confirmBtnBsStyle="dagner"
       >
+      </SweetAlert>
+      <SweetAlert
+        warning
+        showCancel
+        confirmBtnText="Sim, deletar!"
+        confirmBtnBsStyle="danger"
+        title="Tem certeza que deseja continuar?"
+        show={displayWarning}
+        onConfirm={confirmPctDelete}
+        onCancel={() => setDisplayWarning(false)}
+        focusCancelBtn
+      >
+        {warningAlert}
       </SweetAlert>
     </div>
   );

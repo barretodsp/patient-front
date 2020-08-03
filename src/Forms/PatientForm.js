@@ -45,7 +45,7 @@ function PatientForm(props) {
   return (
     <form onSubmit={createPatient} class='patient-form'>
       <div class="container">
-        <div class="row blockField" >
+        <div class="row block-field" >
           <label>
             Primeiro Nome
             <div class="row">
@@ -62,7 +62,7 @@ function PatientForm(props) {
         </div>
 
 
-        <div class="row blockField" >
+        <div class="row block-field" >
           <label>
             Sobrenome
             <div class="row">
@@ -77,7 +77,7 @@ function PatientForm(props) {
             </div>
           </label>
         </div>
-        <div class="row blockField" >
+        <div class="row block-field" >
           <label>
             Data de Nascimento
             <div class="row">
@@ -92,7 +92,7 @@ function PatientForm(props) {
           </label>
         </div>
 
-        <div class="row blockField" >
+        <div class="row block-field" >
           <label>
             CPF
             <div class="row">
@@ -107,7 +107,7 @@ function PatientForm(props) {
           </label>
         </div>
 
-        <div class="row blockField" >
+        <div class="row block-field" >
           <label>
             Telefone Fixo
           <div class="row">
@@ -122,7 +122,7 @@ function PatientForm(props) {
           </label>
         </div>
 
-        <div class="row blockField" >
+        <div class="row block-field" >
           <label>
             Telefone Celular
             <div class="row">
@@ -137,11 +137,12 @@ function PatientForm(props) {
           </label>
         </div>
 
-        <div class="row blockField" >
+        <div class="row block-field" >
           <label>
             Tipo Sanguíneo:
             <div class="row">
               <select class="input-field-sm" onChange={e => setBlood(e.target.value)}>
+                <option value=""></option>
                 <option value="A+">A+</option>
                 <option value="A-">A-</option>
                 <option value="B+">B+</option>
@@ -155,7 +156,7 @@ function PatientForm(props) {
           </label>
         </div>
 
-        <button type="submit">Enviar</button>
+        <button class='btn-send-modal' type="submit">Enviar</button>
       </div>
     </form>
   )

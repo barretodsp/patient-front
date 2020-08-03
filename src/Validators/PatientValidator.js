@@ -66,9 +66,10 @@ async function checkBloodType(bloodType) {
 
 async function checkBirthdate(birthdate) {
   try {
-    console.log('BDATE', birthdate)
-    let date = moment(birthdate);
-    if (date.isValid()) return success
+    console.log('Data', birthdate);
+    let today = moment();
+    let date = moment(birthdate, 'DD/MM/YYY');
+    if (date.isValid() && (date.valueOf() < today.valueOf())) return success
     return { error: 'Data de nascimento inválida.' }
   } catch (er) {
     return { error: 'Data de nascimento inválida.' }
