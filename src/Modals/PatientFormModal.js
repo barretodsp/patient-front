@@ -26,7 +26,7 @@ function PatientFormModal(props){
         contentLabel="Example Modal"
       >
         <h2>Novo Paciente</h2>
-        <button class="btnCancelModal" onClick={closeModal}>Cancelar</button>
+        <button class="btn-cancel-modal" onClick={closeModal}>Cancelar</button>
         <PatientForm afterCreateCB={props.afterCreateCB}/>
       </Modal>
     </div>

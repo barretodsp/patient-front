@@ -9,7 +9,7 @@ import moment from 'moment';
 import { GoDeviceMobile, GoCircleSlash } from 'react-icons/go';
 import ContactModal from '../../Modals/ContactModal';
 import GetPatientsService from '../../Services/Patient/GetPatientsService';
-import AddContactService from '../../Services/Patient/AddContactService';
+import '../../assets/css/formStyle.css'
 
 
 function PatientScreen() {
@@ -80,9 +80,9 @@ function PatientScreen() {
       editable: false,
       formatter: ({ row }) => {
         return (
-          <>
-            <span onClick={() => checkContacts(row.patient_id, row.contacts)}><GoDeviceMobile /></span>
-          </>
+          <div class='icon-center' >
+            <span onClick={() => checkContacts(row.patient_id, row.contacts)}><GoDeviceMobile  /></span>
+          </div>
         )
       }
     },
@@ -95,8 +95,21 @@ function PatientScreen() {
       key: 'blood_type',
       name: 'Tipo Sanguíneo',
       editable: true,
+      filterRenderer: p => (
+        <div className="rdg-filter-container">
+          <select className="rdg-filter" value={p.value} onChange={e => p.onChange(e.target.value)}>
+            <option value="A+">A+</option>
+            <option value="A-">A-</option>
+            <option value="B+">B+</option>
+            <option value="B-">B-</option>
+            <option value="AB+">AB+</option>
+            <option value="AB-">AB-</option>
+            <option value="O+">O+</option>
+            <option value="O-">O-</option>
+          </select>
+        </div>
+      )
     },
-
   ];
 
   useEffect(async () => {
@@ -110,10 +123,10 @@ function PatientScreen() {
   const filteredRows = useMemo(() => {
     return rows.filter(r => {
       return (
-        (filters.title ? r.title.includes(filters.title) : true) &&
-        (filters.email ? r.email.includes(filters.email) : true)
-        // (filters.task ? r.task.includes(filters.task) : true)
-        // && (filters.priority !== 'All' ? r.priority === filters.priority : true)
+        (filters.first_name ? r.first_name.includes(filters.first_name) : true) &&
+        (filters.last_name ? r.last_name.includes(filters.last_name) : true) &&
+        (filters.cpf ? r.cpf.includes(filters.cpf) : true) &&
+        (filters.blood_type ? r.blood_type === filters.blood_type : true) 
         // && (filters.issueType !== 'All' ? r.issueType === filters.issueType : true)
         // && (filters.developer ? r.developer === filters.developer.value : true)
         // && (filters.complete ? filters.complete.filterValues(r, filters.complete, 'complete') : true)

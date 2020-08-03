@@ -81,7 +81,7 @@ function ContactModal(props) {
             Telefone Celular
           <div class="row">
               <InputMask
-                class="inputFieldSm"
+                class="input-field-sm"
                 value={valueCt}
                 // mask={valueCt.replace(/\D/g,'').length == 10 ? (setTimeout("(99)9999-9999", 3000)) : "(99)99999-9999" }
                 mask={"(99)99999-9999"}

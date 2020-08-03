@@ -43,14 +43,14 @@ function PatientForm(props) {
   }
 
   return (
-    <form onSubmit={createPatient} class='patientForm'>
+    <form onSubmit={createPatient} class='patient-form'>
       <div class="container">
         <div class="row blockField" >
           <label>
             Primeiro Nome
             <div class="row">
               <input
-                class="inputField"
+                class="input-field"
                 value={valueFName}
                 onChange={e => setFName(e.target.value)}
                 type="text"
@@ -67,7 +67,7 @@ function PatientForm(props) {
             Sobrenome
             <div class="row">
               <input
-                class="inputField"
+                class="input-field"
                 value={valueLName}
                 onChange={e => setLName(e.target.value)}
                 type="text"
@@ -82,7 +82,7 @@ function PatientForm(props) {
             Data de Nascimento
             <div class="row">
               <InputMask
-                class="inputFieldSm"
+                class="input-field-sm"
                 value={valueBirth}
                 mask="99/99/9999"
                 onChange={e => setBirth(e.target.value)}
@@ -97,7 +97,7 @@ function PatientForm(props) {
             CPF
             <div class="row">
               <InputMask
-                class="inputFieldSm"
+                class="input-field-sm"
                 value={valueCpf}
                 mask="999.999.999-99"
                 onChange={e => setCpf(e.target.value)}
@@ -112,7 +112,7 @@ function PatientForm(props) {
             Telefone Fixo
           <div class="row">
               <InputMask
-                class="inputFieldSm"
+                class="input-field-sm"
                 value={valueTel1}
                 mask={"(99)9999-9999"}
                 onChange={e => setTel1(e.target.value)}
@@ -127,7 +127,7 @@ function PatientForm(props) {
             Telefone Celular
             <div class="row">
               <InputMask
-                class="inputFieldSm"
+                class="input-field-sm"
                 value={valueTel2}
                 mask={"(99)99999-9999"}
                 onChange={e => setTel2(e.target.value)}
@@ -141,7 +141,7 @@ function PatientForm(props) {
           <label>
             Tipo Sanguíneo:
             <div class="row">
-              <select class="inputFieldSm" onChange={e => setBlood(e.target.value)}>
+              <select class="input-field-sm" onChange={e => setBlood(e.target.value)}>
                 <option value="A+">A+</option>
                 <option value="A-">A-</option>
                 <option value="B+">B+</option>
