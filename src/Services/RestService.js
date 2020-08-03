@@ -3,7 +3,7 @@ const RestService = async (modelName, serviceName, method, paramsObject = null) 
     let resp = null;
     let resp2json = null;
     let status = null;
-
+    console.log('SERVICE', serviceName)
     resp = await fetch(`http://localhost:4000/api/v1/${modelName}/${serviceName}`, {
       method,
       headers: {

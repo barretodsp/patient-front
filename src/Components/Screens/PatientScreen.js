@@ -19,6 +19,9 @@ function PatientScreen() {
   const [modalDisplay, changeModalDisplay] = useState(false);
   const [contactDisplay, changeContactDisplay] = useState(false);
   const [alertDisplay, changeAlertDisplay] = useState(false);
+  const [alertDisplayError, changeAlertDisplayError] = useState(false);
+  const [alertError, setErrorMsg] = useState(false);
+
   const [contacts, setContacts] = useState([]);
 
   const columns = [
@@ -97,7 +100,7 @@ function PatientScreen() {
   useEffect(async () => {
     let result = await GetPatientsService();
     console.log('RESULT', result);
-    if(result.success)
+    if (result.success)
       setPatients(result.success)
     return;
   }, [])
@@ -153,13 +156,18 @@ function PatientScreen() {
     changeModalDisplay(true);
   }
 
-  function afterCreateCB(resp) {
+  async function afterCreateCB(resp) {
     let newRows = [...rows];
+    console.log('AFTER DC', resp)
     if (resp.success) {
       changeAlertDisplay(true)
-      newRows.push({ id: Math.random(), title: 'HAHAHAHA', email: 'ooopa@gmail.com' });
-      console.log('ROWS', newRows)
-      setPatients(newRows)
+      changeModalDisplay(false)
+      let result = await GetPatientsService();
+      if (result.success)
+        setPatients(result.success)
+    } else {
+      setErrorMsg(resp.error)
+      changeAlertDisplayError(true);
     }
 
   }
@@ -168,6 +176,9 @@ function PatientScreen() {
     changeAlertDisplay(false)
   }
 
+  function closeAlertError() {
+    changeAlertDisplayError(false)
+  }
   // function closeModal(){
   //   setIsOpen(false);
   // }
@@ -203,6 +214,14 @@ function PatientScreen() {
         confirmBtnBsStyle="success"
       >
         HAHA
+      </SweetAlert>
+      <SweetAlert
+        danger
+        title={alertError}
+        show={alertDisplayError}
+        onConfirm={closeAlertError}
+        confirmBtnBsStyle="dagner"
+      >
       </SweetAlert>
     </div>
   );

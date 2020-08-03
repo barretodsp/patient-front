@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
 import PatientForm from '../Forms/PatientForm';
+import '../assets/css/formStyle.css'
+import globalStyles from '../assets/styles/globalStyles';
 
 
 function PatientFormModal(props){
@@ -15,29 +17,16 @@ function PatientFormModal(props){
     props.updateDisplay(false)
   }
 
-
-  const customStyles = {
-    content: {
-      top: '50%',
-      left: '50%',
-      right: 'auto',
-      bottom: 'auto',
-      zIndex: 1,
-      marginRight: '-50%',
-      transform: 'translate(-50%, -50%)'
-    }
-  };
-
   return (
     <div>
       <Modal
+        class='modal'
         isOpen={modalDisplay}
-        style={customStyles}
+        style={globalStyles.modal}
         contentLabel="Example Modal"
       >
         <h2>Novo Paciente</h2>
-        <button onClick={closeModal}>Cancelar</button>
-        <div>I am a modal</div>
+        <button class="btnCancelModal" onClick={closeModal}>Cancelar</button>
         <PatientForm afterCreateCB={props.afterCreateCB}/>
       </Modal>
     </div>
