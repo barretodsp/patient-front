@@ -83,7 +83,6 @@ function ContactModal(props) {
               <InputMask
                 class="input-field-sm"
                 value={valueCt}
-                // mask={valueCt.replace(/\D/g,'').length == 10 ? (setTimeout("(99)9999-9999", 3000)) : "(99)99999-9999" }
                 mask={"(99)99999-9999"}
                 onChange={e => setValueCt(e.target.value)}
                 disableUnderline
